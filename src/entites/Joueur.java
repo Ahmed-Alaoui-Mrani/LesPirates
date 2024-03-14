@@ -5,6 +5,7 @@ public class Joueur {
     private Integer pointsDeVie;
     private Couleur couleur;
     private Pion pion;
+    private boolean reculePourProchainTour;
 
     public Joueur(Pion pion, String nom, Integer pointsDeVie) {
         this.pion = pion;
@@ -38,6 +39,18 @@ public class Joueur {
     
     public void setPion(Pion pion) {
         this.pion = pion;
+    }
+    
+    public void setReculePourProchainTour(boolean recule) {
+        this.reculePourProchainTour = recule;
+    }
+    
+    public boolean doitReculerPourProchainTour() {
+        return this.reculePourProchainTour;
+    }
+    
+    public boolean aReculePourProchainTour() {
+        return this.reculePourProchainTour;
     }
 
 }

@@ -29,10 +29,47 @@ public class Jeu {
         Pion pion = joueurCourant.getPion();
         int positionActuelle = pion.getPosition().getNumCase();
         int nouvellePosition = positionActuelle + totalDe;
+        
+        if (nouvellePosition == 30) {
+            System.out.println("Vous êtes arrivé à la case 30, félicitations ! Vous avez gagné !");
+            estTermine = true;
+            return;
+        }
+        
+        if (nouvellePosition < 1 || nouvellePosition > 30) {
+            System.out.println("La position doit être comprise entre 1 et 30 inclusivement. Vous devez rejouer !");
+            return;
+        }
+        
+        if (plateau.estCaseFauxEspoir(nouvellePosition) && !joueurCourant.aReculePourProchainTour()) {
+            joueurCourant.setReculePourProchainTour(true);
+            return;
+        }
+        
+        Joueur joueurAdverse = getJoueurAdverse(joueurCourant); // Obtenez le joueur adverse
+        
+        if (joueurCourant.doitReculerPourProchainTour()) {
+            nouvellePosition -= totalDe;
+            joueurCourant.setReculePourProchainTour(false); // Réinitialiser le recul pour le prochain tour
+        }
+        
+        if (nouvellePosition > joueurAdverse.getPion().getPosition().getNumCase()) {
+            joueurAdverse.recevoirDegats(1); // Le joueur dépassé perd 1 point de vie
+            System.out.println(joueurCourant.getNom() + " a dépassé " + joueurAdverse.getNom() + ". " +
+                    joueurAdverse.getNom() + " perd 1 point de vie.");
+        }
+       
         Case nouvelleCase = plateau.getCase(nouvellePosition);
         Pion nouveauPion = new Pion(nouvelleCase, pion.getCouleur());
         joueurCourant.setPion(nouveauPion);
+        
+        
+        if (plateau.estCaseFauxEspoir(nouvellePosition)) {
+            joueurCourant.setReculePourProchainTour(true);
+            return; 
+        }
     }
+
     
     public void changerJoueur() {
         joueurCourantIndex = (joueurCourantIndex + 1) % joueurs.length;
@@ -53,6 +90,15 @@ public class Jeu {
     public boolean estGagnant(Joueur joueur) {
         
         return false;
+    }
+    
+    public Joueur getJoueurAdverse(Joueur joueurCourant) {
+        // Si le joueur courant est le premier joueur dans le tableau
+        if (joueurCourant == joueurs[0]) {
+            return joueurs[1];
+        } else {
+            return joueurs[0];
+        }
     }
 
 }
