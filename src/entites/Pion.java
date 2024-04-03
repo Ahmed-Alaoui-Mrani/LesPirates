@@ -17,8 +17,12 @@ public class Pion {
         return this.couleur;
     }
 
-    public void setPosition(int position) {
-    	    this.position = new Case (position);
+    public void setPosition(Case position) {
+        this.position = position;
     }
+    public void setPosition(int position) {
+    
+    }
+
 
 }

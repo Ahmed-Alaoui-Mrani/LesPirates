@@ -1,14 +1,20 @@
 package entites;
 
 public class Case {
-	private Integer numCase;
+    private Integer numCase;
+    
+    public Case() {
+    	
+    }
 
     public Case(Integer numCase) {
         this.numCase = numCase;
     }
 
-    public Integer getNumCase() {
-        return this.numCase;
+    public int getNumCase() {
+        return numCase;
     }
-
+    
 }
+
+

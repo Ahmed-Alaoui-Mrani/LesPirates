@@ -1,104 +1,114 @@
 package entites;
 
+import java.util.Random;
+import java.util.Scanner;
+
 public class Jeu {
-	private Joueur[] joueurs;
+    private Pirate[] pirates;
     private Plateau plateau;
     private boolean estTermine;
-    private int joueurCourantIndex;
+    private int pirateCourantIndex;
+    private Depassement depassement;
+    private CaseEffetHP caseEffetHP3;
 
-    public Jeu(Joueur joueur1, Joueur joueur2) {
-        this.joueurs = new Joueur[]{joueur1, joueur2};
+    public Jeu(Pirate pirate1, Pirate pirate2) {
+        this.pirates = new Pirate[]{pirate1, pirate2};
         this.plateau = new Plateau();
         this.estTermine = false;
-        this.joueurCourantIndex = 0; // Commence avec le premier joueur
+        this.pirateCourantIndex = 0; 
+        this.depassement = new Depassement(); 
+        this.caseEffetHP3 = new CaseEffetHP(this);
+
     }
-    
+
+    public void tourPirate(int totalDe) {
+        Pirate pirateCourant = getPirateCourant();
+        Pion pion = pirateCourant.getPion();
+        Case positionActuelle = pion.getPosition();
+        int nouvellePosition = positionActuelle.getNumCase() + totalDe;
+
+        if (nouvellePosition == 30) {
+            System.out.println("Vous êtes arrivé à la case 30, félicitations ! Vous avez gagné !");
+            estTermine = true;
+            return;
+        }
+
+        if (nouvellePosition > 30) {
+            System.out.println("La position doit être comprise entre 1 et 30 inclusivement. Vous devez rejouer !");
+            return;
+        }
+
+        Case nouvelleCase = plateau.getCase(nouvellePosition);
+        pion.setPosition(nouvelleCase);
+
+        // Appliquer l'effet de dépassement après le déplacement du pirate
+        if (depassement.appliquerEffetDepassement(pirates[0], pirates[1])) {
+            // Afficher les points de vie des pirates après le dépassement
+            System.out.println("Points de vie après le dépassement :");
+            System.out.println("Pirate 1 : " + pirates[0].getPointsDeVie());
+            System.out.println("Pirate 2 : " + pirates[1].getPointsDeVie());
+            
+            // Appliquer l'effet spécial de la case 29
+            CaseEffetPosition.FauxEspoir(pirateCourant);
+
+            // Vérifier si le pirate doit reculer au prochain tour
+            if (pirateCourant.doitReculerPourProchainTour()) {
+                System.out.println("Le pirate reculera au prochain tour !");
+                pirateCourant.setReculePourProchainTour(true);
+            }
+            
+            // Appliquer l'effet spécial de la case 15
+            caseEffetHP3.hopital(pirateCourant);
+            
+            if (nouvellePosition == 3) {
+                Pirate pirateAdverse = getPirateAdverse(pirateCourant);
+                if (pirateAdverse != null) {
+                    caseEffetHP3.coupDeFeu(pirateAdverse);
+                } else {
+                    System.out.println("Aucun pirate adverse n'a été trouvé.");
+                }
+            }
+        }
+    }
+
+
+
+    public void lancerPartie() {
+        // Logique du lancement de la partie
+    }
+
+    public void initialiserJeu() {
+        // Logique de l'initialisation du jeu
+    }
+
+    public void changerPirate() {
+        pirateCourantIndex = (pirateCourantIndex + 1) % pirates.length;
+    }
+
+    public Pirate getPirateCourant() {
+        return pirates[pirateCourantIndex];
+    }
+
+    public Pirate getPirateAdverse() {
+        return pirates[(pirateCourantIndex + 1) % pirates.length];
+    }
+
     public boolean estTermine() {
-        for (Joueur joueur : joueurs) {
-            if (joueur.getPointsDeVie() <= 0) {
+        for (Pirate pirate : pirates) {
+            if (pirate.getPointsDeVie() <= 0) {
                 estTermine = true;
                 break;
             }
         }
         return estTermine;
     }
-
-
-    public void tourJoueur(int totalDe) {
-        Joueur joueurCourant = getJoueurCourant();
-        Pion pion = joueurCourant.getPion();
-        int positionActuelle = pion.getPosition().getNumCase();
-        int nouvellePosition = positionActuelle + totalDe;
-        
-        if (nouvellePosition == 30) {
-            System.out.println("Vous êtes arrivé à la case 30, félicitations ! Vous avez gagné !");
-            estTermine = true;
-            return;
-        }
-        
-        if (nouvellePosition < 1 || nouvellePosition > 30) {
-            System.out.println("La position doit être comprise entre 1 et 30 inclusivement. Vous devez rejouer !");
-            return;
-        }
-        
-        if (plateau.estCaseFauxEspoir(nouvellePosition) && !joueurCourant.aReculePourProchainTour()) {
-            joueurCourant.setReculePourProchainTour(true);
-            return;
-        }
-        
-        Joueur joueurAdverse = getJoueurAdverse(joueurCourant); // Obtenez le joueur adverse
-        
-        if (joueurCourant.doitReculerPourProchainTour()) {
-            nouvellePosition -= totalDe;
-            joueurCourant.setReculePourProchainTour(false); // Réinitialiser le recul pour le prochain tour
-        }
-        
-        if (nouvellePosition > joueurAdverse.getPion().getPosition().getNumCase()) {
-            joueurAdverse.recevoirDegats(1); // Le joueur dépassé perd 1 point de vie
-            System.out.println(joueurCourant.getNom() + " a dépassé " + joueurAdverse.getNom() + ". " +
-                    joueurAdverse.getNom() + " perd 1 point de vie.");
-        }
-       
-        Case nouvelleCase = plateau.getCase(nouvellePosition);
-        Pion nouveauPion = new Pion(nouvelleCase, pion.getCouleur());
-        joueurCourant.setPion(nouveauPion);
-        
-        
-        if (plateau.estCaseFauxEspoir(nouvellePosition)) {
-            joueurCourant.setReculePourProchainTour(true);
-            return; 
-        }
-    }
-
     
-    public void changerJoueur() {
-        joueurCourantIndex = (joueurCourantIndex + 1) % joueurs.length;
-    }
-    
-    public Joueur getJoueurAdverse() {
-        return joueurs[(joueurCourantIndex + 1) % joueurs.length];
-    }
-    
-    public Joueur getJoueurCourant() {
-        return joueurs[joueurCourantIndex];
-    }
-    
-    public void lancerPartie() {
-       
-    }
-
-    public boolean estGagnant(Joueur joueur) {
-        
-        return false;
-    }
-    
-    public Joueur getJoueurAdverse(Joueur joueurCourant) {
-        // Si le joueur courant est le premier joueur dans le tableau
-        if (joueurCourant == joueurs[0]) {
-            return joueurs[1];
-        } else {
-            return joueurs[0];
+    public Pirate getPirateAdverse(Pirate pirate) {
+        for (Pirate p : pirates) {
+            if (p != pirate) {
+                return p;
+            }
         }
+        return null; // Gestion du cas où aucun pirate adverse n'est trouvé
     }
-
 }

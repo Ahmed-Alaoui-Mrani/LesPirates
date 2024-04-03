@@ -1,17 +1,20 @@
 package entites;
 
-public class Joueur {
+public class Pirate {
     private String nom;
     private Integer pointsDeVie;
     private Couleur couleur;
     private Pion pion;
     private boolean reculePourProchainTour;
+    private boolean bloquePourProchainTour;
 
-    public Joueur(Pion pion, String nom, Integer pointsDeVie) {
+    public Pirate(Pion pion, String nom, Integer pointsDeVie, Couleur couleur) {
         this.pion = pion;
         this.nom = nom;
         this.pointsDeVie = pointsDeVie;
+        this.couleur = couleur; // Assurez-vous d'initialiser la couleur correctement
     }
+
 
     public void recevoirDegats(Integer degats) {
         this.pointsDeVie -= degats;
@@ -52,5 +55,25 @@ public class Joueur {
     public boolean aReculePourProchainTour() {
         return this.reculePourProchainTour;
     }
+    public Couleur getCouleur() {
+        return this.couleur;
+    }
+    
+    public void setPointsDeVie(int pointsDeVie) {
+        this.pointsDeVie = pointsDeVie;
+    }
+    
+    public boolean estDepasse(int position) {
+        return this.getPion().getPosition().getNumCase() < position;
+    }
+    
+    public void setBloquePourProchainTour(boolean bloque) {
+        this.bloquePourProchainTour = bloque;
+    }
+
+    public boolean estBloquePourProchainTour() {
+        return this.bloquePourProchainTour;
+    }
+
 
 }

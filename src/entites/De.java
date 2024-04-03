@@ -1,22 +1,12 @@
 package entites;
 
+import java.util.Random;
+
 public class De {
-	private Integer valeur;
+    private static Random random = new Random();
 
-    public De() {
-        this.valeur = 0;
+    public static int lancerDe() {
+        return random.nextInt(6) + 1;
     }
-
-    public Integer lanceDe() {
-        return this.valeur;
-    }
-
-    public Integer getValeur() {
-        return this.valeur;
-    }
-
-    public void setValeur(Integer valeurDe) {
-        this.valeur = valeurDe;
-    }
-
 }
+

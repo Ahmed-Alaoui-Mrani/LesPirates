@@ -4,47 +4,56 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-	  public static void main(String[] args) {
+
+    public static void main(String[] args) {
         // Création des instances
         Plateau plateau = new Plateau();
-        Joueur joueur1 = new Joueur(new Pion(plateau.getCase(1), Couleur.ROUGE), "Joueur 1 (Rouge)", 5);
-        Joueur joueur2 = new Joueur(new Pion(plateau.getCase(1), Couleur.BLEU), "Joueur 2 (Bleu)", 5);
-        Jeu jeu = new Jeu(joueur1, joueur2);
-        
+        Pirate pirate1 = new Pirate(new Pion(plateau.getCase(1), Couleur.ROUGE), "Pirate 1 (Rouge)", 5, Couleur.ROUGE);
+        Pirate pirate2 = new Pirate(new Pion(plateau.getCase(1), Couleur.BLEU), "Pirate 2 (Bleu)", 5, Couleur.BLEU);
+
+        Jeu jeu = new Jeu(pirate1, pirate2);
+
         Scanner scanner = new Scanner(System.in);
         Random random = new Random();
 
         System.out.println("Bienvenue dans le jeu des pirates !\n");
+        System.out.println("Règles des cases spéciales:");
+        System.out.println("3 : Si un pirate tombe sur cette case, l'adversaire perd 1 HP.");
+        System.out.println("15 : Si un pirate tombe sur cette case, il gagne 1 HP.");
+        System.out.println("18 : Si un pirate tombe sur cette case, il retourne à la case de départ.");
+        System.out.println("21 : Si un pirate tombe sur cette case, il est bloqué pendant un tour.");
+        System.out.println("29 : Si un pirate tombe sur cette case, il reculera au prochain tour.\n");
 
         while (!jeu.estTermine()) {
-            System.out.println("Tour de " + jeu.getJoueurCourant().getNom() + " (points de vie: " +
-                    jeu.getJoueurCourant().getPointsDeVie() + ")\n");
+            System.out.println("Tour de " + jeu.getPirateCourant().getNom() + " (points de vie: " +
+                    jeu.getPirateCourant().getPointsDeVie() + ")\n");
 
-            System.out.println("Veuillez appuyez sur Entrée pour lancer les dés.");
+            System.out.println("Veuillez appuyer sur Entrée pour lancer les dés.");
             scanner.nextLine();
 
             // Lancer des dés
-            int de1 = random.nextInt(6) + 1;
-            int de2 = random.nextInt(6) + 1;
-            int totalDe = de1 + de2;
-            System.out.println("Vous avez lancé " + de1 + " et " + de2 + ". Avancez de " + totalDe + " cases.\n");
+            int de = De.lancerDe(); // Utilisation de la classe De pour lancer le dé
+            int totalDe = de; // Initialisation du total des dés avec le résultat du dé lancé
+            System.out.println("Vous avez lancé " + de + ". Avancez de " + totalDe + " cases.\n");
 
-            // Déplacer le pion du joueur
-            jeu.tourJoueur(totalDe);
+            // Déplacer le pion du pirate
+            jeu.tourPirate(totalDe);
 
-            // Afficher le plateau
-            plateau.afficherPlateau(joueur1, joueur2);
+            // Afficher le plateau après avoir déplacé le pion
+            plateau.afficherPlateau(jeu.getPirateCourant(), jeu.getPirateAdverse());
 
-            // Vérifier si le joueur a gagné ou perdu des points de vie
-            if (jeu.getJoueurCourant().getPointsDeVie() <= 0) {
-                System.out.println(jeu.getJoueurAdverse().getNom() + " a gagné !");
+            // Vérifier si le pirate a gagné ou perdu des points de vie
+            if (jeu.getPirateCourant().getPointsDeVie() <= 0) {
+                System.out.println(jeu.getPirateAdverse().getNom() + " a gagné !");
                 break;
             }
 
-            // Changer de joueur
-            jeu.changerJoueur();
+            // Changer de pirate
+            jeu.changerPirate();
         }
 
+
+
         scanner.close();
-	  }
+    }
 }
